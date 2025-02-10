@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GameStateManager : MonoBehaviour
 {
+    public GameManager gameManager;
+
     // Gameobject with pause UI message
     public GameObject pauseMenuUI;
     // Gameobject with main menu UI message
@@ -43,30 +45,26 @@ public class GameStateManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M) && currentState == GameState.Gameplay_State)
         {
-            ChangeState(GameState.MainMenu_State);
+            ChangeStateToGameplay();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (currentState == GameState.Gameplay_State || currentState == GameState.Paused_State)
+            if (currentState == GameState.Gameplay_State)
             {
-                if (isPaused)
-                {
-                    Resume();
-                }
-                else
-                {
-                    ChangeState(GameState.Paused_State);
-                    Pause();
-                }
+                Pause();
+            }
+            else if (currentState == GameState.Paused_State)
+            {
+                Resume();
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Input.GetKeyDown(KeyCode.G) && currentState == GameState.MainMenu_State)
         {
-            ChangeState(GameState.Gameplay_State);
+            ChangeStateToGameplay();
         }
     }
 
@@ -75,47 +73,49 @@ public class GameStateManager : MonoBehaviour
         switch (state)
         {
             case GameState.MainMenu_State:
-
                 mainMenuUI.SetActive(true);
                 gameplayUI.SetActive(false);
                 pauseMenuUI.SetActive(false);
                 Debug.Log("Switched to Main Menu screen");
-
-
                 break;
 
             case GameState.Gameplay_State:
-
                 mainMenuUI.SetActive(false);
                 gameplayUI.SetActive(true);
                 pauseMenuUI.SetActive(false);
                 Debug.Log("Switched to Gameplay screen");
-
-
                 break;
 
             case GameState.Paused_State:
-
                 mainMenuUI.SetActive(false);
                 gameplayUI.SetActive(false);
+                pauseMenuUI.SetActive(true);
                 Debug.Log("Switched to Pause screen");
-
-
                 break;
+
         }
+    }
+
+    public void ChangeStateToMainMenu()
+    {
+        ChangeState(GameState.MainMenu_State);
+        gameManager.uiManager.EnableMainMenu();
     }
 
     public void Resume()
     {
-        pauseMenuUI.SetActive(false);
+        ChangeState(GameState.Gameplay_State);
         Time.timeScale = 1f;
-        isPaused = false;
     }
 
     public void Pause()
     {
-        pauseMenuUI.SetActive(true);
+        ChangeState(GameState.Paused_State);
         Time.timeScale = 0f;
-        isPaused = true;
+    }
+
+    public void ChangeStateToGameplay()
+    {
+        ChangeState(GameState.Gameplay_State);
     }
 }
