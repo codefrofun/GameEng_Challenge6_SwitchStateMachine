@@ -19,6 +19,7 @@ public class GameStateManager : MonoBehaviour
 
     public enum GameState
     { 
+        // Different gamestates 
         MainMenu_State, Gameplay_State, Paused_State
     }
 
@@ -29,6 +30,7 @@ public class GameStateManager : MonoBehaviour
 
     private void Start()
     {
+        // On start, show main menu
         ChangeState(GameState.MainMenu_State);
     }
 
@@ -45,6 +47,7 @@ public class GameStateManager : MonoBehaviour
 
     private void Update()
     {
+        // Logic for buttons going to main menu, gameplay, and pause
         if (Input.GetKeyDown(KeyCode.M) && currentState == GameState.Gameplay_State)
         {
             ChangeStateToGameplay();
@@ -117,5 +120,17 @@ public class GameStateManager : MonoBehaviour
     public void ChangeStateToGameplay()
     {
         ChangeState(GameState.Gameplay_State);
+    }
+
+    // Referenced quit game method from previous project, closes game to desktop.
+    public void QuitGame()
+    {
+        Debug.Log("Quitting the game...");
+
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
     }
 }
