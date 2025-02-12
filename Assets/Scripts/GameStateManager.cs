@@ -7,20 +7,13 @@ public class GameStateManager : MonoBehaviour
 {
     public GameManager gameManager;
 
-    // Gameobject with pause UI message
-    public GameObject pauseMenuUI;
-    // Gameobject with main menu UI message
-    public GameObject mainMenuUI;
-    // Gameobject with gamplay UI message
-    public GameObject gameplayUI;
-
     // Bool to freeze gameplay
     private bool isPaused = false;
 
     public enum GameState
     { 
         // Different gamestates 
-        MainMenu_State, Gameplay_State, Paused_State
+        MainMenu_State, Gameplay_State, Paused_State, Credit_State
     }
 
     public GameState currentState { get; private set; }
@@ -47,12 +40,6 @@ public class GameStateManager : MonoBehaviour
 
     private void Update()
     {
-        // Logic for buttons going to main menu, gameplay, and pause
-        if (Input.GetKeyDown(KeyCode.M) && currentState == GameState.Gameplay_State)
-        {
-            ChangeStateToGameplay();
-        }
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (currentState == GameState.Gameplay_State)
@@ -69,6 +56,11 @@ public class GameStateManager : MonoBehaviour
         {
             ChangeStateToGameplay();
         }
+
+        if (Input.GetKeyDown(KeyCode.C) && currentState == GameState.MainMenu_State)
+        {
+            ChangeStateToCredit();
+        }
     }
 
     private void HandleStateChange(GameState state)
@@ -76,24 +68,27 @@ public class GameStateManager : MonoBehaviour
         switch (state)
         {
             case GameState.MainMenu_State:
-                mainMenuUI.SetActive(true);
-                gameplayUI.SetActive(false);
-                pauseMenuUI.SetActive(false);
+                Time.timeScale = 0f;
+                gameManager.uiManager.EnableMainMenu();
                 Debug.Log("Switched to Main Menu screen");
                 break;
 
             case GameState.Gameplay_State:
-                mainMenuUI.SetActive(false);
-                gameplayUI.SetActive(true);
-                pauseMenuUI.SetActive(false);
+                Time.timeScale = 1f;
+                gameManager.uiManager.EnableGameplay();
                 Debug.Log("Switched to Gameplay screen");
                 break;
 
             case GameState.Paused_State:
-                mainMenuUI.SetActive(false);
-                gameplayUI.SetActive(false);
-                pauseMenuUI.SetActive(true);
+                Time.timeScale = 0f;
+                gameManager.uiManager.EnablePause();
                 Debug.Log("Switched to Pause screen");
+                break;
+
+            case GameState.Credit_State:
+                Time.timeScale = 0f;
+                gameManager.uiManager.EnableCredits();
+                Debug.Log("Switched to Main Menu screen");
                 break;
 
         }
@@ -114,12 +109,16 @@ public class GameStateManager : MonoBehaviour
     public void Pause()
     {
         ChangeState(GameState.Paused_State);
-        Time.timeScale = 0f;
     }
 
     public void ChangeStateToGameplay()
     {
         ChangeState(GameState.Gameplay_State);
+    }
+
+    public void ChangeStateToCredit()
+    {
+        ChangeState(GameState.Credit_State);
     }
 
     // Referenced quit game method from previous project, closes game to desktop.
